@@ -1,0 +1,2 @@
+add_executable(discontinuity_cloud_gen discontinuity_cloud_gen.cc)
+target_link_libraries(discontinuity_cloud_gen kitti_loader auto_cali)
