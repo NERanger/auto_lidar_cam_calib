@@ -50,7 +50,7 @@ void Calibrator::CalibrationTrack(const Eigen::Isometry3f& init, Eigen::Isometry
 
 float Calibrator::MiscalibrationDetection(const Eigen::Isometry3f& T_cl) {
 	std::vector<Eigen::Isometry3f> grid;
-	GenGridIsometry3f(grid, T_cl, 1, 5.0f, 0.2f);
+	GenGridIsometry3f(grid, T_cl, 1, 2.0f, 0.2f);
 	grid.push_back(T_cl);
 
 	LOG(INFO) << "Grid size: " << grid.size();
@@ -79,10 +79,10 @@ float Calibrator::MiscalibrationDetection(const Eigen::Isometry3f& T_cl) {
 	float center_cost = costs.back();
 	int worse_num = 0;
 	for (const float &c : costs) {
-		if (center_cost < c) {
+		if (center_cost > c) {
 			worse_num += 1;
 		}
-		// LOG(INFO) << c;
+		LOG(INFO) << c;
 	}
 
 	return static_cast<float>(worse_num) / static_cast<float>(costs.size() - 1);

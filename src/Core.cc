@@ -197,7 +197,7 @@ void alcc::PtCloudXYZIToCvPoint3f(const PtCloudXYZI_Type& cloud, std::vector<cv:
 }
 
 float alcc::GetSubPixelValBilinear(const cv::Mat& img, const cv::Point2f& pixel) {
-	CHECK_EQ(img.type(), CV_32FC1);
+	// CHECK_EQ(img.type(), CV_32FC1);
 
 	int x = static_cast<int>(pixel.x);
 	int y = static_cast<int>(pixel.y);

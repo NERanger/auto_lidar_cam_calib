@@ -25,7 +25,22 @@ int main(int argc, char const* argv[]) {
 
     kitti::Intrinsics intri = kitti_dataset.GetLeftCamIntrinsics();
     
-    kitti::Frame f = kitti_dataset[90];
+    alcc::Calibrator calibrator;
+    calibrator.SetCameraIntrinsic(intri.fx * 0.3f, intri.fy * 0.3f, intri.cx * 0.3f, intri.cy * 0.3f);
+    calibrator.SetMaxFrameNum(5);
+    for (int i = 0; i < 5; ++i) {
+        kitti::Frame f = kitti_dataset[i];
+        cv::resize(f.left_img, f.left_img, cv::Size(), 0.3, 0.3);
+        calibrator.AddDataFrame(f.ptcloud, f.left_img);
+    }
+
+    float score = calibrator.MiscalibrationDetection(kitti_dataset.GetExtrinsics());
+
+    LOG(INFO) << score;
+
+#if 0
+
+    kitti::Frame f = kitti_dataset[0];
 
     cv::Mat edge_img;
     alcc::GenEdgeImage(f.left_img, edge_img);
@@ -43,8 +58,7 @@ int main(int argc, char const* argv[]) {
     cv::imshow("img", inverse_img);
     cv::waitKey(0);
 
-#if 0
-
+    //-------------
 
     alcc::PtCloudXYZI_Type::Ptr discon_cloud = alcc::GenDiscontinuityCloud(*f.ptcloud);
 
@@ -54,20 +68,9 @@ int main(int argc, char const* argv[]) {
 
     pcl::io::savePCDFileBinary("E://discon_cloud_filtered.pcd", *discon_cloud);
 
+    // ------------
 
-
-    alcc::Calibrator calibrator;
-    calibrator.SetCameraIntrinsic(intri.fx * 0.3f, intri.fy * 0.3f, intri.cx * 0.3f, intri.cy * 0.3f);
-    calibrator.SetMaxFrameNum(5);
-    for (int i = 90; i < 95; ++i) {
-        kitti::Frame f = kitti_dataset[i];
-        cv::resize(f.left_img, f.left_img, cv::Size(), 0.3, 0.3);
-        calibrator.AddDataFrame(f.ptcloud, f.left_img);
-    }
-
-    float score = calibrator.MiscalibrationDetection(kitti_dataset.GetExtrinsics());
-
-    LOG(INFO) << score;
+    
 
 #endif
 
