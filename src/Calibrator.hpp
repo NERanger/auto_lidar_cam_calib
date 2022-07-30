@@ -13,7 +13,7 @@ namespace alcc {
 		void AddDataFrame(const PtCloudXYZI_Type::Ptr &cloud, const Img_Type &img);
 
 		// Extrinsic in T_cl
-		void CalibrationTrack(const Eigen::Isometry3f &init, Eigen::Isometry3f& result);
+		void CalibrationTrack(const Eigen::Isometry3f &init, Eigen::Isometry3f& result, int iter_num);
 
 		float MiscalibrationDetection(const Eigen::Isometry3f& T_cl);
 

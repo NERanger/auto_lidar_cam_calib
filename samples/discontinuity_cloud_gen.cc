@@ -24,11 +24,25 @@ int main(int argc, char const* argv[]) {
     CHECK(kitti_success);
 
     kitti::Intrinsics intri = kitti_dataset.GetLeftCamIntrinsics();
-
-    kitti::Frame f = kitti_dataset[300];
-    cv::resize(f.left_img, f.left_img, cv::Size(), 0.2, 0.2);
-
     
+    kitti::Frame f = kitti_dataset[90];
+
+    cv::Mat edge_img;
+    alcc::GenEdgeImage(f.left_img, edge_img);
+
+    cv::resize(edge_img, edge_img, cv::Size(), 0.3, 0.3);
+
+    cv::imshow("edge_img", edge_img);
+    cv::waitKey(0);
+
+    cv::Mat inverse_img;
+    alcc::InverseDistTransform(edge_img, inverse_img);
+
+    inverse_img.convertTo(inverse_img, CV_8UC1);
+
+    cv::imshow("img", inverse_img);
+    cv::waitKey(0);
+
 #if 0
 
 
@@ -42,33 +56,22 @@ int main(int argc, char const* argv[]) {
 
 
 
-    cv::Mat edge_img;
-    alcc::GenEdgeImage(f.left_img, edge_img);
-
-    cv::resize(edge_img, edge_img, cv::Size(), 0.3, 0.3);
-
-    cv::imshow("edge_img", edge_img);
-    cv::waitKey(0);
-
-    cv::Mat inverse_img;
-    alcc::InverseDistTransform(edge_img, inverse_img);
-
-    cv::imshow("img", inverse_img);
-    cv::waitKey(0);
-
-    
-
-#endif
-
     alcc::Calibrator calibrator;
-    calibrator.SetCameraIntrinsic(intri.fx * 0.2f, intri.fy * 0.2f, intri.cx * 0.2f, intri.cy * 0.2f);
-    calibrator.SetMaxFrameNum(1);
-
-    calibrator.AddDataFrame(f.ptcloud, f.left_img);
+    calibrator.SetCameraIntrinsic(intri.fx * 0.3f, intri.fy * 0.3f, intri.cx * 0.3f, intri.cy * 0.3f);
+    calibrator.SetMaxFrameNum(5);
+    for (int i = 90; i < 95; ++i) {
+        kitti::Frame f = kitti_dataset[i];
+        cv::resize(f.left_img, f.left_img, cv::Size(), 0.3, 0.3);
+        calibrator.AddDataFrame(f.ptcloud, f.left_img);
+    }
 
     float score = calibrator.MiscalibrationDetection(kitti_dataset.GetExtrinsics());
 
     LOG(INFO) << score;
+
+#endif
+
+    
 
     return EXIT_SUCCESS;
 }

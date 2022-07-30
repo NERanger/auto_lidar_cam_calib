@@ -94,17 +94,34 @@ float alcc::EuclideanDistanceToOrigin(const PointXYZI_Type& point) {
 void alcc::InverseDistTransform(const Img_Type& edge_img, Img_Type& out) {
 	static constexpr float alpha = 1.0f / 3.0f;
 
-	out = cv::Mat::zeros(edge_img.size(), CV_8UC1);
+	out = cv::Mat::zeros(edge_img.size(), CV_32FC1);
+
+#if 1
+	// Parallel implementation
+	cv::parallel_for_(cv::Range(0, out.rows * out.cols),
+		[&](const cv::Range& range) {
+			for (int r = range.start; r < range.end; r++) {
+				int row = r / out.cols;
+				int col = r % out.cols;
+
+				const uchar& edge_val = edge_img.at<uchar>(row, col);
+
+				out.ptr<float>(row)[col] = alpha * edge_val + (1.0f - alpha) * ComputeMaxTermInInverseTransform(edge_img, cv::Point2i(col, row));
+			}
+		});
+#endif
+
+#if 0
+	// Single thread implementation
 	for (int col = 0; col < out.cols; ++col) {
 		for (int row = 0; row < out.rows; ++row) {
 			const uchar& edge_val = edge_img.at<uchar>(row, col);
 
 			uchar& out_val = out.at<uchar>(row, col);
 			out_val = alpha * edge_val + (1.0f - alpha) * ComputeMaxTermInInverseTransform(edge_img, cv::Point2i(col, row));
-
-			// LOG_EVERY_N(INFO, 1000) << col << " " << row;
 		}
 	}
+#endif
 }
 
 float alcc::ComputeMaxTermInInverseTransform(const Img_Type& edge_img, const cv::Point2i& pixel) {
@@ -180,6 +197,8 @@ void alcc::PtCloudXYZIToCvPoint3f(const PtCloudXYZI_Type& cloud, std::vector<cv:
 }
 
 float alcc::GetSubPixelValBilinear(const cv::Mat& img, const cv::Point2f& pixel) {
+	CHECK_EQ(img.type(), CV_32FC1);
+
 	int x = static_cast<int>(pixel.x);
 	int y = static_cast<int>(pixel.y);
 
@@ -191,10 +210,10 @@ float alcc::GetSubPixelValBilinear(const cv::Mat& img, const cv::Point2f& pixel)
 	float a = pixel.x - static_cast<float>(x);
 	float c = pixel.y - static_cast<float>(y);
 
-	float val_00 = static_cast<float>(img.at<uchar>(y0, x0));
-	float val_01 = static_cast<float>(img.at<uchar>(y1, x0));
-	float val_10 = static_cast<float>(img.at<uchar>(y0, x1));
-	float val_11 = static_cast<float>(img.at<uchar>(y1, x1));
+	float val_00 = static_cast<float>(img.at<float>(y0, x0));
+	float val_01 = static_cast<float>(img.at<float>(y1, x0));
+	float val_10 = static_cast<float>(img.at<float>(y0, x1));
+	float val_11 = static_cast<float>(img.at<float>(y1, x1));
 
 	return (val_00 * (1.f - a) + val_10 * a) * (1.f - c) + (val_01 * (1.f - a) + val_11 * a) * c;
 }
