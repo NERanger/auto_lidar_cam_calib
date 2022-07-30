@@ -30,9 +30,15 @@ namespace alcc {
 	
 	float EuclideanDistanceToOrigin(const PointXYZI_Type &point);
 
-	float SingelFrameCost(const Img_Type& img, const PtCloudXYZI_Type &cloud, const Eigen::Isometry3f &T_cl, const cv::Mat &intri);
+	float SingelFrameCost(const Img_Type& edge_img, const PtCloudXYZI_Type& discon_cloud, const Eigen::Isometry3f &T_cl, const cv::Mat &intri);
 
 	void PtCloudXYZIToCvPoint3f(const PtCloudXYZI_Type& cloud, std::vector<cv::Point3f>& result_pts, std::vector<float>& result_intensity);
 
 	float GetSubPixelValBilinear(const cv::Mat& img, const cv::Point2f& pixel);
+
+	void GenGridIsometry3f(std::vector<Eigen::Isometry3f>& grid, const Eigen::Isometry3f& center, int step_num, float rot_step, float trans_step);
+
+	Eigen::Quaternionf EulerToQuat(float x, float y, float z);
+
+	void RemovePixelOutSideImg(std::vector<cv::Point2f>& pixels, std::vector<float>& discon_vals, int height, int width);
 }

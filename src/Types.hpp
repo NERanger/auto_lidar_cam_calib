@@ -23,8 +23,8 @@ namespace alcc {
 		float cx = 0.0f;
 		float cy = 0.0f;
 
-		const Eigen::Matrix3f& AsMat() const;
+		Eigen::Matrix3f AsMat() const;
 
-		const cv::Mat& AsCvMat() const;
+		cv::Mat AsCvMat() const;
 	};
 }

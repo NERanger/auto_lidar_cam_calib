@@ -8,5 +8,6 @@ namespace alcc {
 		Constants() = delete;
 
 		static const cv::Mat& UnitRotationVec();
+		static const float& Deg2Rad();
 	};
 }

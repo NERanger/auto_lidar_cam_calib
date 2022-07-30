@@ -2,7 +2,7 @@
 
 using alcc::CamIntrisic;
 
-const Eigen::Matrix3f& CamIntrisic::AsMat() const {
+Eigen::Matrix3f CamIntrisic::AsMat() const {
 	Eigen::Matrix3f mat;
 	mat <<
 		fx, 0.0f, cx,
@@ -12,7 +12,7 @@ const Eigen::Matrix3f& CamIntrisic::AsMat() const {
 	return mat;
 }
 
-const cv::Mat& CamIntrisic::AsCvMat() const {
+cv::Mat CamIntrisic::AsCvMat() const {
 	cv::Mat mat = cv::Mat::eye(3, 3, CV_32FC1);
 	mat.at<float>(0, 0) = fx;
 	mat.at<float>(1, 1) = fy;

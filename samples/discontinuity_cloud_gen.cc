@@ -6,6 +6,7 @@
 
 #include "kitti_loader/KittiLoader.hpp"
 
+#include "Calibrator.hpp"
 #include "Core.hpp"
 
 int main(int argc, char const* argv[]) {
@@ -22,19 +23,24 @@ int main(int argc, char const* argv[]) {
     kitti::KittiLoader kitti_dataset(kitti_path, kitti_success);
     CHECK(kitti_success);
 
-    kitti::Frame f = kitti_dataset[300];
+    kitti::Intrinsics intri = kitti_dataset.GetLeftCamIntrinsics();
 
+    kitti::Frame f = kitti_dataset[300];
+    cv::resize(f.left_img, f.left_img, cv::Size(), 0.2, 0.2);
+
+    
 #if 0
+
 
     alcc::PtCloudXYZI_Type::Ptr discon_cloud = alcc::GenDiscontinuityCloud(*f.ptcloud);
 
     pcl::io::savePCDFileBinary("E://discon_cloud.pcd", *discon_cloud);
 
-    alcc::CloudDiscontinuityFilter(*discon_cloud, 0.3f);
+    alcc::CloudDiscontinuityFilter(*discon_cloud, 0.5f);
 
     pcl::io::savePCDFileBinary("E://discon_cloud_filtered.pcd", *discon_cloud);
 
-#endif
+
 
     cv::Mat edge_img;
     alcc::GenEdgeImage(f.left_img, edge_img);
@@ -49,6 +55,20 @@ int main(int argc, char const* argv[]) {
 
     cv::imshow("img", inverse_img);
     cv::waitKey(0);
+
+    
+
+#endif
+
+    alcc::Calibrator calibrator;
+    calibrator.SetCameraIntrinsic(intri.fx * 0.2f, intri.fy * 0.2f, intri.cx * 0.2f, intri.cy * 0.2f);
+    calibrator.SetMaxFrameNum(1);
+
+    calibrator.AddDataFrame(f.ptcloud, f.left_img);
+
+    float score = calibrator.MiscalibrationDetection(kitti_dataset.GetExtrinsics());
+
+    LOG(INFO) << score;
 
     return EXIT_SUCCESS;
 }

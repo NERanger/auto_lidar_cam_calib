@@ -15,10 +15,18 @@ namespace alcc {
 		// Extrinsic in T_cl
 		void CalibrationTrack(const Eigen::Isometry3f &init, Eigen::Isometry3f& result);
 
+		float MiscalibrationDetection(const Eigen::Isometry3f& T_cl);
+
 	private:
+
+		float SingleExtriCost(const Eigen::Isometry3f& T_cl);
+		void ProcessDataFrames();
 
 		std::vector<DataFrame_Type> frames_;
 		size_t max_num_ = 1;
+
+		std::vector<DataFrame_Type> processed_frames_;
+		bool processed_frames_d_flag_ = true;
 
 		CamIntrisic intri_;
 	};
