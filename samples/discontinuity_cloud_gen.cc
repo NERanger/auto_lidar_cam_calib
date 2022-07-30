@@ -34,9 +34,13 @@ int main(int argc, char const* argv[]) {
         calibrator.AddDataFrame(f.ptcloud, f.left_img);
     }
 
-    float score = calibrator.MiscalibrationDetection(kitti_dataset.GetExtrinsics());
+    // float score = calibrator.MiscalibrationDetection(kitti_dataset.GetExtrinsics());
+    // LOG(INFO) << score;
 
-    LOG(INFO) << score;
+    Eigen::Isometry3f result;
+    calibrator.CalibrationTrack(kitti_dataset.GetExtrinsics(), result, 10);
+
+    LOG(INFO) << result.matrix();
 
 #if 0
 

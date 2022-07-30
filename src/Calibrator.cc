@@ -14,6 +14,7 @@
 using alcc::Calibrator;
 
 Calibrator::Calibrator() {
+
 }
 
 void Calibrator::AddDataFrame(const PtCloudXYZI_Type::Ptr& cloud, const Img_Type& img) {
@@ -26,7 +27,7 @@ void Calibrator::AddDataFrame(const PtCloudXYZI_Type::Ptr& cloud, const Img_Type
 }
 
 void Calibrator::CalibrationTrack(const Eigen::Isometry3f& init, Eigen::Isometry3f& result, int iter_num) {
-	static constexpr int grid_step_num = 2;
+	static constexpr int grid_step_num = 1;
 	static constexpr float grid_rot_step = 0.5f;
 	static constexpr float grid_trans_step = 0.05f;
 
@@ -39,13 +40,19 @@ void Calibrator::CalibrationTrack(const Eigen::Isometry3f& init, Eigen::Isometry
 	ProcessDataFrames();
 	LOG(INFO) << "Processing data frames... Done";
 
-	std::vector<float> costs;
-	cv::parallel_for_(cv::Range(0, grid.size()),
-		[&](const cv::Range& range) {
-			for (int r = range.start; r < range.end; ++r) {
-				float cost = SingleExtriCost(grid.at(r));
-			}
-		});
+	for (int iter = 0; iter < iter_num; ++iter) {
+		LOG(INFO) << "Iteration: " << iter << " out of " << iter_num;
+
+		// Single thread implementation
+		std::vector<float> costs(grid.size());
+		for (size_t i = 0; i < grid.size(); ++i) {
+			costs[i] = SingleExtriCost(grid[i]);
+		}
+
+		int max_index = std::max_element(costs.begin(), costs.end()) - costs.begin();
+		result = grid[max_index];
+	}
+
 }
 
 float Calibrator::MiscalibrationDetection(const Eigen::Isometry3f& T_cl) {
@@ -82,7 +89,6 @@ float Calibrator::MiscalibrationDetection(const Eigen::Isometry3f& T_cl) {
 		if (center_cost > c) {
 			worse_num += 1;
 		}
-		LOG(INFO) << c;
 	}
 
 	return static_cast<float>(worse_num) / static_cast<float>(costs.size() - 1);
