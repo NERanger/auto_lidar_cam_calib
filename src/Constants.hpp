@@ -1,0 +1,12 @@
+#pragma once
+
+#include <opencv2/core/mat.hpp>
+
+namespace alcc {
+	class Constants {
+	public:
+		Constants() = delete;
+
+		static const cv::Mat& UnitRotationVec();
+	};
+}

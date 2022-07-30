@@ -3,6 +3,7 @@ add_library(
 		Calibrator.cc
 		Core.cc
 		Types.cc
+		Constants.cc
 )
 target_compile_features(auto_cali PUBLIC cxx_std_17)
 target_link_libraries(auto_cali PUBLIC Eigen3::Eigen ${OpenCV_LIBS} ${PCL_LIBRARIES} glog::glog)

@@ -16,6 +16,7 @@ namespace alcc {
 		void CalibrationTrack(const Eigen::Isometry3f &init, Eigen::Isometry3f& result);
 
 	private:
+
 		std::vector<DataFrame_Type> frames_;
 		size_t max_num_ = 1;
 

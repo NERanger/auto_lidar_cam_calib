@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Eigen/Core>
+
 #include "Types.hpp"
 
 // Image coordinate
@@ -27,4 +29,10 @@ namespace alcc {
 	float ComputeMaxTermInInverseTransform(const Img_Type &edge_img, const cv::Point2i &pixel);
 	
 	float EuclideanDistanceToOrigin(const PointXYZI_Type &point);
+
+	float SingelFrameCost(const Img_Type& img, const PtCloudXYZI_Type &cloud, const Eigen::Isometry3f &T_cl, const cv::Mat &intri);
+
+	void PtCloudXYZIToCvPoint3f(const PtCloudXYZI_Type& cloud, std::vector<cv::Point3f>& result_pts, std::vector<float>& result_intensity);
+
+	float GetSubPixelValBilinear(const cv::Mat& img, const cv::Point2f& pixel);
 }
