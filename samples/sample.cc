@@ -39,7 +39,7 @@ int main(int argc, char const* argv[]) {
 
     Eigen::Isometry3f result;
     calibrator.CalibrationTrack(kitti_dataset.GetExtrinsics(), result, 10);
-
+    calibrator.MiscalibrationDetection
     LOG(INFO) << result.matrix();
 
 #if 0
