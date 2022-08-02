@@ -188,7 +188,7 @@ void alcc::PtCloudXYZIToCvPoint3f(const PtCloudXYZI_Type& cloud, std::vector<cv:
 	result_intensity.reserve(cloud.size());
 
 	for (const PointXYZI_Type &pt : cloud.points) {
-		if (pt.z < 0.0f) {
+		if (pt.z < 0.0f) { // Remove points with negative z value in camera coordinate
 			continue;
 		}
 		result_pts.push_back(cv::Point3f(pt.x, pt.y, pt.z));

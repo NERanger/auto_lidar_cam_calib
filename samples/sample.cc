@@ -8,6 +8,8 @@
 
 #include "Calibrator.hpp"
 #include "Core.hpp"
+#include "Rand.hpp"
+#include "Misc.hpp"
 
 int main(int argc, char const* argv[]) {
     if (argc != 2) {
@@ -24,23 +26,35 @@ int main(int argc, char const* argv[]) {
     CHECK(kitti_success);
 
     kitti::Intrinsics intri = kitti_dataset.GetLeftCamIntrinsics();
-    
+
     alcc::Calibrator calibrator;
     calibrator.SetCameraIntrinsic(intri.fx * 0.3f, intri.fy * 0.3f, intri.cx * 0.3f, intri.cy * 0.3f);
     calibrator.SetMaxFrameNum(5);
-    for (int i = 0; i < 5; ++i) {
-        kitti::Frame f = kitti_dataset[i];
-        cv::resize(f.left_img, f.left_img, cv::Size(), 0.3, 0.3);
-        calibrator.AddDataFrame(f.ptcloud, f.left_img);
+
+    Eigen::Isometry3f origin_extri = kitti_dataset.GetExtrinsics();
+    Eigen::Isometry3f err_extri = alcc::Rand::SingleUniformIsometry3f(2.0f, 0.2f) * origin_extri;
+
+    m2d::DataManager::SetRoot("E://");
+    alcc::FrameNumVec6DataBag::Ptr bag(new alcc::FrameNumVec6DataBag("err_1"));
+    m2d::DataManager::Add(bag);
+
+    Eigen::Isometry3f extri = origin_extri;
+    for (int i = 0; i < 1000; ++i) {
+        if (i == 500) {
+            extri = err_extri;
+        }
+
+        alcc::Vector6f err_vec = alcc::GetIsometryErr(origin_extri, extri);
+
+        bag->AddData(i, err_vec);
+
     }
 
-    // float score = calibrator.MiscalibrationDetection(kitti_dataset.GetExtrinsics());
-    // LOG(INFO) << score;
+    m2d::DataManager::DumpAll();
 
-    Eigen::Isometry3f result;
-    calibrator.CalibrationTrack(kitti_dataset.GetExtrinsics(), result, 10);
-    calibrator.MiscalibrationDetection
-    LOG(INFO) << result.matrix();
+    // Eigen::Isometry3f result;
+    // calibrator.CalibrationTrack(kitti_dataset.GetExtrinsics(), result, 10);
+    // LOG(INFO) << result.matrix();
 
 #if 0
 

@@ -9,5 +9,6 @@ namespace alcc {
 
 		static const cv::Mat& UnitRotationVec();
 		static const float& Deg2Rad();
+		static const float& Rad2Deg();
 	};
 }

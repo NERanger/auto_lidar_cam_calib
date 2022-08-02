@@ -11,6 +11,7 @@ namespace alcc {
 	using PointXYZI_Type = pcl::PointXYZI;
 	using PtCloudXYZI_Type = pcl::PointCloud<pcl::PointXYZI>;
 	using Img_Type = cv::Mat;
+	using Vector6f = Eigen::Matrix<float, 6, 1>;
 
 	struct DataFrame_Type {
 		PtCloudXYZI_Type::Ptr cloud;

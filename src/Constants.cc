@@ -26,3 +26,13 @@ const float& Constants::Deg2Rad() {
 
 	return deg2rad;
 }
+
+const float& Constants::Rad2Deg() {
+	static float rad2deg = -1.0f;
+
+	if (rad2deg < 0.0f) {
+		rad2deg = 180.0f / M_PI;
+	}
+
+	return rad2deg;
+}
