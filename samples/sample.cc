@@ -34,19 +34,31 @@ int main(int argc, char const* argv[]) {
     Eigen::Isometry3f origin_extri = kitti_dataset.GetExtrinsics();
     Eigen::Isometry3f err_extri = alcc::Rand::SingleUniformIsometry3f(2.0f, 0.2f) * origin_extri;
 
-    m2d::DataManager::SetRoot("E://");
-    alcc::FrameNumVec6DataBag::Ptr bag(new alcc::FrameNumVec6DataBag("err_1"));
-    m2d::DataManager::Add(bag);
+    m2d::DataManager::SetRoot("E:/exp_data/comp_exp");
+    alcc::FrameNumVec6DataBag::Ptr bag_gt(new alcc::FrameNumVec6DataBag("err_gt"));
+    alcc::FrameNumVec6DataBag::Ptr bag_track(new alcc::FrameNumVec6DataBag("err_track"));
+    m2d::DataManager::Add(bag_gt);
+    m2d::DataManager::Add(bag_track);
 
-    Eigen::Isometry3f extri = origin_extri;
-    for (int i = 0; i < 1000; ++i) {
-        if (i == 500) {
-            extri = err_extri;
+    Eigen::Isometry3f extri_gt = origin_extri;
+    Eigen::Isometry3f track_extri = origin_extri;
+    for (int i = 0; i < 500; ++i) {
+        kitti::Frame f = kitti_dataset[i];
+        cv::resize(f.left_img, f.left_img, cv::Size(), 0.3, 0.3);
+        calibrator.AddDataFrame(f.ptcloud, f.left_img);
+
+        if (i == 200) {
+            extri_gt = err_extri;
+
+            calibrator.CalibrationTrack(err_extri, track_extri, 10);
         }
+        
 
-        alcc::Vector6f err_vec = alcc::GetIsometryErr(origin_extri, extri);
+        alcc::Vector6f err_gt_vec = alcc::GetIsometryErr(origin_extri, extri_gt);
+        bag_gt->AddData(i, err_gt_vec);
 
-        bag->AddData(i, err_vec);
+        alcc::Vector6f err_track_vec = alcc::GetIsometryErr(origin_extri, track_extri);
+        bag_track->AddData(i, err_track_vec);
 
     }
 

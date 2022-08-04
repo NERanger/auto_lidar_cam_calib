@@ -10,6 +10,7 @@
 
 #include "Calibrator.hpp"
 #include "Core.hpp"
+#include "StopWatch.hpp"
 
 using alcc::Calibrator;
 
@@ -27,21 +28,20 @@ void Calibrator::AddDataFrame(const PtCloudXYZI_Type::Ptr& cloud, const Img_Type
 }
 
 void Calibrator::CalibrationTrack(const Eigen::Isometry3f& init, Eigen::Isometry3f& result, int iter_num) {
-	static constexpr int grid_step_num = 1;
-	static constexpr float grid_rot_step = 0.5f;
-	static constexpr float grid_trans_step = 0.05f;
+	static constexpr int grid_step_num = 2;
+	static constexpr float grid_rot_step = 0.3f;
+	static constexpr float grid_trans_step = 0.03f;
 
 	std::vector<Eigen::Isometry3f> grid;
 	GenGridIsometry3f(grid, init, grid_step_num, grid_rot_step, grid_trans_step);
 	grid.push_back(init);
 	LOG(INFO) << "Grid size: " << grid.size();
 
-	LOG(INFO) << "Processing data frames...";
 	ProcessDataFrames();
-	LOG(INFO) << "Processing data frames... Done";
 
+	StopWatch sw;
 	for (int iter = 0; iter < iter_num; ++iter) {
-		LOG(INFO) << "Iteration: " << iter << " out of " << iter_num;
+		LOG(INFO) << "Iteration: " << iter + 1 << " out of " << iter_num;
 
 		// Single thread implementation
 		std::vector<float> costs(grid.size());
@@ -52,6 +52,8 @@ void Calibrator::CalibrationTrack(const Eigen::Isometry3f& init, Eigen::Isometry
 		int max_index = std::max_element(costs.begin(), costs.end()) - costs.begin();
 		result = grid[max_index];
 	}
+
+	LOG(INFO) << "Track time: " << sw.GetTimeElapse();
 
 }
 
@@ -113,6 +115,8 @@ void Calibrator::ProcessDataFrames() {
 
 	LOG(INFO) << "Data processing start, frame number: " << frames_.size();
 
+	StopWatch sw;
+
 	processed_frames_.clear();
 	processed_frames_.resize(frames_.size());
 
@@ -157,4 +161,6 @@ void Calibrator::ProcessDataFrames() {
 #endif
 
 	processed_frames_d_flag_ = false;
+
+	LOG(INFO) << "Processing time: " << sw.GetTimeElapse();
 }

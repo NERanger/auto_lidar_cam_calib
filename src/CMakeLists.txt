@@ -6,6 +6,7 @@ add_library(
 		Constants.cc
 		Misc.cc
 		Rand.cc
+		StopWatch.cc
 )
 target_compile_features(auto_cali PUBLIC cxx_std_17)
 target_link_libraries(auto_cali PUBLIC Eigen3::Eigen ${OpenCV_LIBS} ${PCL_LIBRARIES} glog::glog mem2disk)
