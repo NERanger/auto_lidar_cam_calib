@@ -21,14 +21,14 @@ void FrameNumVec6DataBag::DumpToDisk() {
 	sf::path file_path(root);
 	file_path = file_path / sf::path(name_ + ".txt");
 
-	float rad2deg = Constants::Rad2Deg();
+	// float rad2deg = Constants::Rad2Deg();
 
 	std::ofstream fs(file_path.string());
 	for (const auto& d : data_) {
 		const Vector6f &vec = d.second;
 		fs << d.first
 			<< " " << vec(0) << " " << vec(1) << " " << vec(2)
-			<< " " << vec(3) * rad2deg << " " << vec(4) * rad2deg << " " << vec(5) * rad2deg << std::endl;
+			<< " " << vec(3) << " " << vec(4) << " " << vec(5) << std::endl;
 	}
 
 	fs.close();
