@@ -32,16 +32,16 @@ void Calibrator::CalibrationTrack(const Eigen::Isometry3f& init, Eigen::Isometry
 	static constexpr float grid_rot_step = 0.3f;
 	static constexpr float grid_trans_step = 0.03f;
 
-	std::vector<Eigen::Isometry3f> grid;
-	GenGridIsometry3f(grid, init, grid_step_num, grid_rot_step, grid_trans_step);
-	grid.push_back(init);
-	LOG(INFO) << "Grid size: " << grid.size();
-
 	ProcessDataFrames();
 
 	StopWatch sw;
 	for (int iter = 0; iter < iter_num; ++iter) {
 		LOG(INFO) << "Iteration: " << iter + 1 << " out of " << iter_num;
+
+		std::vector<Eigen::Isometry3f> grid;
+		GenGridIsometry3f(grid, init, grid_step_num, grid_rot_step, grid_trans_step);
+		grid.push_back(init);
+		LOG(INFO) << "Grid size: " << grid.size();
 
 		// Single thread implementation
 		std::vector<float> costs(grid.size());
