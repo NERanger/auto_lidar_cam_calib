@@ -34,8 +34,8 @@ int main(int argc, char const* argv[]) {
     Eigen::Isometry3f origin_extri = kitti_dataset.GetExtrinsics();
     
 
-    m2d::DataManager::SetRoot("E:/exp_data/comp_exp/kitti_00_0_1000");
-    alcc::FrameNumVec6DataBag::Ptr bag_track(new alcc::FrameNumVec6DataBag("thrun_1"));
+    m2d::DataManager::SetRoot("D:\\Datasets\\exp\\comp_exp\\kitti05");
+    alcc::FrameNumVec6DataBag::Ptr bag_track(new alcc::FrameNumVec6DataBag("thrun_0"));
     m2d::DataManager::Add(bag_track);
 
 

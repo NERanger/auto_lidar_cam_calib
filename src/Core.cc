@@ -117,7 +117,7 @@ void alcc::InverseDistTransform(const Img_Type& edge_img, Img_Type& out) {
 		for (int row = 0; row < out.rows; ++row) {
 			const uchar& edge_val = edge_img.at<uchar>(row, col);
 
-			uchar& out_val = out.at<uchar>(row, col);
+			float& out_val = out.at<float>(row, col);
 			out_val = alpha * edge_val + (1.0f - alpha) * ComputeMaxTermInInverseTransform(edge_img, cv::Point2i(col, row));
 		}
 	}

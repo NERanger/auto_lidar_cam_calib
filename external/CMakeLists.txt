@@ -1,6 +1,7 @@
 add_library(kitti_loader STATIC
 	kitti_loader/KittiLoader.cc
 )
+target_compile_features(kitti_loader PUBLIC cxx_std_17)
 target_link_libraries(kitti_loader PUBLIC Eigen3::Eigen ${OpenCV_LIBS} ${PCL_LIBRARIES})
 target_include_directories(kitti_loader PUBLIC 
 	${CMAKE_CURRENT_LIST_DIR}
@@ -9,6 +10,7 @@ target_include_directories(kitti_loader PUBLIC
 add_library(mem2disk STATIC
 	mem2disk/Mem2Disk.cc
 )
+target_compile_features(mem2disk PUBLIC cxx_std_17)
 target_include_directories(mem2disk PUBLIC 
 	${CMAKE_CURRENT_LIST_DIR}
 )
