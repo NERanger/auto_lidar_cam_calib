@@ -43,11 +43,27 @@ void Calibrator::CalibrationTrack(const Eigen::Isometry3f& init, Eigen::Isometry
 		grid.push_back(init);
 		LOG(INFO) << "Grid size: " << grid.size();
 
-		// Single thread implementation
 		std::vector<float> costs(grid.size());
+		
+#if 0
+		// Multithread implementation
+		cv::parallel_for_(cv::Range(0, grid.size()),
+			[&](const cv::Range& range) {
+				for (int r = range.start; r < range.end; ++r) {
+					costs[r] = SingleExtriCost(grid[r]);
+				}
+			});
+#endif
+
+
+#if 1
+		// Single thread implementation
+		progressbar bar(grid.size());
 		for (size_t i = 0; i < grid.size(); ++i) {
+			bar.update();
 			costs[i] = SingleExtriCost(grid[i]);
 		}
+#endif
 
 		int max_index = std::max_element(costs.begin(), costs.end()) - costs.begin();
 		result = grid[max_index];
