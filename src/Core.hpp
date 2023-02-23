@@ -19,7 +19,10 @@ namespace alcc {
 
 	void CloudDiscontinuityFilter(PtCloudXYZI_Type& cloud, float discontinuity_lower_lim);
 
+	void GenThreshMask(const Img_Type& img_in, Img_Type& img_out);
+
 	void GenEdgeImage(const Img_Type &input, Img_Type &out);
+	void GenEdgeImageWithMask(const Img_Type& input, Img_Type& out, const Img_Type& mask);
 	void GetPixelNeighbors(const Img_Type &img, const cv::Point2i &pixel, std::vector<int> &neighbor_vals);
 	
 	// Get the max absolute difference value between x and values in vec

@@ -163,7 +163,14 @@ void Calibrator::ProcessDataFrames() {
 		const DataFrame_Type& f = frames_.at(i);
 
 		cv::Mat edge_img, inv_trans;
-		alcc::GenEdgeImage(f.img, edge_img);
+		if (use_mask_) {
+			cv::Mat mask;
+			alcc::GenThreshMask(f.img, mask);
+			alcc::GenEdgeImageWithMask(f.img, edge_img, mask);
+		}
+		else {
+			alcc::GenEdgeImage(f.img, edge_img);
+		}
 		alcc::InverseDistTransform(edge_img, inv_trans);
 
 		PtCloudXYZI_Type::Ptr discon_cloud = GenDiscontinuityCloud(*f.cloud);

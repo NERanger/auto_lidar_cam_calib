@@ -28,18 +28,19 @@ int main(int argc, char const* argv[]) {
     kitti::Intrinsics intri = kitti_dataset.GetLeftCamIntrinsics();
 
     alcc::Calibrator calibrator;
+    calibrator.SetUseMask(true);
     calibrator.SetCameraIntrinsic(intri.fx * 0.3f, intri.fy * 0.3f, intri.cx * 0.3f, intri.cy * 0.3f);
     calibrator.SetMaxFrameNum(5);
 
     Eigen::Isometry3f origin_extri = kitti_dataset.GetExtrinsics();
     
 
-    m2d::DataManager::SetRoot("D:\\Datasets\\exp\\comp_exp\\kitti05_1000_2000");
+    m2d::DataManager::SetRoot("F:\\nclt\\exp\\nclt_loam_800_1600");
     alcc::FrameNumVec6DataBag::Ptr bag_track(new alcc::FrameNumVec6DataBag("thrun_0"));
     m2d::DataManager::Add(bag_track);
 
 
-    for (int i = 1500; i < 1507; ++i) {
+    for (int i = 1200; i < 1206; ++i) {
         kitti::Frame f = kitti_dataset[i];
         cv::resize(f.left_img, f.left_img, cv::Size(), 0.3, 0.3);
         calibrator.AddDataFrame(f.ptcloud, f.left_img);
@@ -66,16 +67,27 @@ int main(int argc, char const* argv[]) {
 
     kitti::Frame f = kitti_dataset[0];
 
-    cv::Mat edge_img;
-    alcc::GenEdgeImage(f.left_img, edge_img);
+    cv::Mat mask;
+    alcc::GenThreshMask(f.left_img, mask);
 
-    cv::resize(edge_img, edge_img, cv::Size(), 0.3, 0.3);
+    cv::imshow("mask", mask);
+    cv::imshow("origin_img", f.left_img);
+    cv::waitKey(0);
+    cv::destroyAllWindows();
+
+    cv::Mat edge_img, edge_img_mask;
+    alcc::GenEdgeImage(f.left_img, edge_img);
+    alcc::GenEdgeImageWithMask(f.left_img, edge_img_mask, mask);
+
+    cv::resize(edge_img, edge_img, cv::Size(), 0.2, 0.2);
+    cv::resize(edge_img_mask, edge_img_mask, cv::Size(), 0.2, 0.2);
 
     cv::imshow("edge_img", edge_img);
+    cv::imshow("edge_img_mask", edge_img_mask);
     cv::waitKey(0);
 
     cv::Mat inverse_img;
-    alcc::InverseDistTransform(edge_img, inverse_img);
+    alcc::InverseDistTransform(edge_img_mask, inverse_img);
 
     inverse_img.convertTo(inverse_img, CV_8UC1);
 
@@ -84,21 +96,17 @@ int main(int argc, char const* argv[]) {
 
     //-------------
 
-    alcc::PtCloudXYZI_Type::Ptr discon_cloud = alcc::GenDiscontinuityCloud(*f.ptcloud);
+    // alcc::PtCloudXYZI_Type::Ptr discon_cloud = alcc::GenDiscontinuityCloud(*f.ptcloud);
 
-    pcl::io::savePCDFileBinary("E://discon_cloud.pcd", *discon_cloud);
+    // pcl::io::savePCDFileBinary("E://discon_cloud.pcd", *discon_cloud);
 
-    alcc::CloudDiscontinuityFilter(*discon_cloud, 0.5f);
+    // alcc::CloudDiscontinuityFilter(*discon_cloud, 0.5f);
 
-    pcl::io::savePCDFileBinary("E://discon_cloud_filtered.pcd", *discon_cloud);
+    // pcl::io::savePCDFileBinary("E://discon_cloud_filtered.pcd", *discon_cloud);
 
     // ------------
 
-    
-
 #endif
-
-    
 
     return EXIT_SUCCESS;
 }

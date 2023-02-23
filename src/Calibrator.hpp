@@ -7,6 +7,7 @@ namespace alcc {
 	public:
 		Calibrator();
 
+		inline void SetUseMask(bool use_mask) { use_mask_ = use_mask; }
 		inline void SetMaxFrameNum(size_t num) { max_num_ = num; }
 		inline void SetCameraIntrinsic(float fx, float fy, float cx, float cy) { intri_ = CamIntrisic{fx, fy, cx, cy}; }
 
@@ -27,6 +28,8 @@ namespace alcc {
 
 		std::vector<DataFrame_Type> processed_frames_;
 		bool processed_frames_d_flag_ = true;
+
+		bool use_mask_ = false;
 
 		CamIntrisic intri_;
 	};

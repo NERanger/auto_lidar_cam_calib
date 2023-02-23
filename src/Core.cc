@@ -7,6 +7,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/core/types_c.h>
 #include <opencv2/calib3d.hpp>
+#include <opencv2/imgproc.hpp>
 
 #include <glog/logging.h>
 
@@ -60,6 +61,26 @@ void alcc::GenEdgeImage(const Img_Type& input, Img_Type& out) {
 		}
 	}
 }
+
+void alcc::GenEdgeImageWithMask(const Img_Type& input, Img_Type& out, const Img_Type& mask) {
+	out = cv::Mat::zeros(input.size(), CV_8UC1);
+
+	for (int col = 0; col < input.cols; ++col) {
+		for (int row = 0; row < input.rows; ++row) {
+			int mask_val = static_cast<int>(mask.at<uchar>(row, col));
+			if (mask_val < 1) { continue; }
+
+			int pixel_val = static_cast<int>(input.at<uchar>(row, col));
+
+			std::vector<int> neighbor_vals;
+			GetPixelNeighbors(input, cv::Point2i(col, row), neighbor_vals);
+
+			int max_abs_diff = GetMaxAbsDiffVal(pixel_val, neighbor_vals);
+			out.at<uchar>(row, col) = static_cast<uchar>(max_abs_diff);
+		}
+	}
+}
+
 int alcc::GetMaxAbsDiffVal(int x, const std::vector<int>& vec){
 	using Eigen::VectorXi;
 
@@ -300,4 +321,10 @@ void alcc::RemovePixelOutSideImg(std::vector<cv::Point2f>& pixels, std::vector<f
 
 	pixels = pixels_res;
 	discon_vals = discon_res;
+}
+
+void alcc::GenThreshMask(const Img_Type& img_in, Img_Type& img_out) {
+	img_out = cv::Mat::zeros(img_in.size(), CV_8UC1);
+	cv::threshold(img_in, img_out, 1.0, 255.0, cv::THRESH_BINARY);
+	cv::erode(img_out, img_out, cv::Mat::ones(cv::Size(15, 15), CV_32FC1));
 }

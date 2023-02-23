@@ -81,7 +81,8 @@ KittiLoader::KittiLoader(const string &data_root, bool &if_success) : root_(data
 
 Frame KittiLoader::operator[](size_t i) const{
     using boost::format;
-    format fmt_lidar("%s/%06d.bin");
+    // format fmt_lidar("%s/%06d.bin");
+    format fmt_lidar("%s/%06d.pcd");
     format fmt_img("%s/%06d.png");
 
     string ptcloud = (fmt_lidar % lidar_path_.string() % i).str();
