@@ -28,6 +28,8 @@ int main(int argc, char const* argv[]) {
     kitti::Intrinsics intri = kitti_dataset.GetLeftCamIntrinsics();
 
     alcc::Calibrator calibrator;
+    // Mask is for removing large balck area after undistorting a fisheye camera image
+    // e.g. the images provided by nclt dataset
     calibrator.SetUseMask(true);
     calibrator.SetCameraIntrinsic(intri.fx * 0.3f, intri.fy * 0.3f, intri.cx * 0.3f, intri.cy * 0.3f);
     calibrator.SetMaxFrameNum(5);
